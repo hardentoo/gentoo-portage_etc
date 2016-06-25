@@ -1,0 +1,18 @@
+diff -Nuar llvm-3.8.0.src.orig/projects/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc llvm-3.8.0.src/projects/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc
+--- llvm-3.8.0.src.orig/projects/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc	2016-06-25 16:42:03.584942011 +0100
++++ llvm-3.8.0.src/projects/compiler-rt/lib/sanitizer_common/sanitizer_platform_limits_posix.cc	2016-06-25 16:41:23.143628949 +0100
+@@ -142,10 +142,10 @@
+ #include <glob.h>
+ #include <obstack.h>
+ #include <mqueue.h>
+-#include <net/if_ppp.h>
+-#include <netax25/ax25.h>
+-#include <netipx/ipx.h>
+-#include <netrom/netrom.h>
++#include <linux/if_ppp.h>
++#include <linux/ax25.h>
++#include <linux/ipx.h>
++#include <linux/netrom.h>
+ #if HAVE_RPC_XDR_H
+ # include <rpc/xdr.h>
+ #elif HAVE_TIRPC_RPC_XDR_H

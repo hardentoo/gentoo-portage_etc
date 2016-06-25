@@ -1,0 +1,38 @@
+diff -Nuar llvm-3.8.0.src.orig/projects/compiler-rt/cmake/config-ix.cmake llvm-3.8.0.src/projects/compiler-rt/cmake/config-ix.cmake
+--- llvm-3.8.0.src.orig/projects/compiler-rt/cmake/config-ix.cmake	2016-06-25 17:09:37.720730784 +0100
++++ llvm-3.8.0.src/projects/compiler-rt/cmake/config-ix.cmake	2016-06-25 17:10:10.111980972 +0100
+@@ -545,13 +545,15 @@
+ 
+ message(STATUS "Compiler-RT supported architectures: ${COMPILER_RT_SUPPORTED_ARCH}")
+ 
++string(REGEX MATCH "musl[^-]*$" LLVM_ENV_MUSL ${LLVM_HOST_TRIPLE})
++
+ if(ANDROID)
+   set(OS_NAME "Android")
+ else()
+   set(OS_NAME "${CMAKE_SYSTEM_NAME}")
+ endif()
+ 
+-if (SANITIZER_COMMON_SUPPORTED_ARCH AND NOT LLVM_USE_SANITIZER AND
++if (SANITIZER_COMMON_SUPPORTED_ARCH AND NOT LLVM_USE_SANITIZER AND NOT LLVM_ENV_MUSL AND
+     (OS_NAME MATCHES "Android|Darwin|Linux|FreeBSD" OR
+     (OS_NAME MATCHES "Windows" AND MSVC)))
+   set(COMPILER_RT_HAS_SANITIZER_COMMON TRUE)
+diff -Nuar llvm-3.8.0.src.orig/projects/compiler-rt/lib/Makefile.mk llvm-3.8.0.src/projects/compiler-rt/lib/Makefile.mk
+--- llvm-3.8.0.src.orig/projects/compiler-rt/lib/Makefile.mk	2015-02-18 23:26:49.000000000 +0100
++++ llvm-3.8.0.src/projects/compiler-rt/lib/Makefile.mk	2016-06-25 17:10:28.927126298 +0100
+@@ -10,10 +10,10 @@
+ SubDirs :=
+ 
+ # Add submodules.
+-SubDirs += asan
++#SubDirs += asan
+ SubDirs += builtins
+ SubDirs += interception
+-SubDirs += lsan
++#SubDirs += lsan
+ SubDirs += profile
+-SubDirs += sanitizer_common
+-SubDirs += ubsan
++#SubDirs += sanitizer_common
++#SubDirs += ubsan

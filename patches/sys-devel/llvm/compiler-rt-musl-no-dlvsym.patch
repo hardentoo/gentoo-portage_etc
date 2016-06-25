@@ -1,0 +1,12 @@
+diff -Nuar llvm-3.8.0.src.orig/projects/compiler-rt/lib/interception/interception_linux.cc llvm-3.8.0.src/projects/compiler-rt/lib/interception/interception_linux.cc
+--- llvm-3.8.0.src.orig/projects/compiler-rt/lib/interception/interception_linux.cc	2014-02-24 09:37:41.000000000 +0100
++++ llvm-3.8.0.src/projects/compiler-rt/lib/interception/interception_linux.cc	2016-06-25 13:38:21.617008281 +0100
+@@ -24,7 +24,7 @@
+   return real == wrapper;
+ }
+ 
+-#if !defined(__ANDROID__)  // android does not have dlvsym
++#if defined(__GLIBC__) // !defined(__ANDROID__)  // android does not have dlvsym
+ void *GetFuncAddrVer(const char *func_name, const char *ver) {
+   return dlvsym(RTLD_NEXT, func_name, ver);
+ }
