@@ -1,0 +1,32 @@
+From 50a86cceb44c626ff137fbc1826e49b9e5cdd047 Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Mon, 16 May 2016 11:33:38 +1000
+Subject: Add configure.ac check for static_assert
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Part of C11, defined via assert.h.
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+Reviewed-by: Jonas Ådahl <jadahl@gmail.com>
+Tested-by: Baruch Siach <baruch@tkos.co.il>
+
+diff --git a/configure.ac b/configure.ac
+index 8ddc3b6..8c14efe 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -59,6 +59,10 @@ AC_CHECK_DECL(TFD_CLOEXEC,[],
+ AC_CHECK_DECL(CLOCK_MONOTONIC,[],
+ 	      [AC_MSG_ERROR("CLOCK_MONOTONIC is needed to compile libinput")],
+ 	      [[#include <time.h>]])
++AC_CHECK_DECL(static_assert, [],
++	      [AC_DEFINE(static_assert(...), [/* */], [noop static_assert() replacement]),
++              AC_MSG_RESULT([no])],
++	      [[#include <assert.h>]])
+ 
+ PKG_PROG_PKG_CONFIG()
+ PKG_CHECK_MODULES(MTDEV, [mtdev >= 1.1.0])
+-- 
+cgit v0.10.2
+
