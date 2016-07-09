@@ -94,7 +94,6 @@
 <sys-devel/llvm-3.9
 <sys-firmware/intel-microcode-20151231
 <sys-fs/cryptsetup-1.8
-<sys-libs/musl-1.1.15
 <sys-libs/musl-obstack-1.1
 <sys-power/powertop-2.9
 <sys-power/thermald-1.5
