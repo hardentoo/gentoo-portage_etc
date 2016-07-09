@@ -1,0 +1,56 @@
+diff -Nuar elfutils-0.166.orig/src/ld.c elfutils-0.166/src/ld.c
+--- elfutils-0.166.orig/src/ld.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/ld.c	2016-07-09 15:10:43.095381175 +0100
+@@ -275,6 +275,7 @@
+ {
+   int remaining;
+   int err;
++  int error_message_count = 0;
+ 
+   /* Sanity check.  We always want to use the LFS functionality.  */
+   if (sizeof (off_t) != 8)
+@@ -316,7 +317,8 @@
+   /* We need at least one input file.  */
+   if (input_file_list == NULL)
+     {
+-      error (0, 0, gettext ("At least one input file needed"));
++      err (0, gettext ("At least one input file needed"));
++      error_message_count++;
+       argp_help (&argp_1st, stderr, ARGP_HELP_SEE, "ld");
+       exit (EXIT_FAILURE);
+     }
+@@ -331,16 +333,20 @@
+ 
+   /* Prepare state.  */
+   err = ld_prepare_state (emulation);
+-  if (err != 0)
+-    error (EXIT_FAILURE, 0, gettext ("error while preparing linking"));
++  if (err != 0) {
++    err (EXIT_FAILURE, gettext ("error while preparing linking"));
++    error_message_count++;
++  }
+ 
+   /* XXX Read the linker script now.  Since we later will have the linker
+      script built in we don't go into trouble to make sure we handle GROUP
+      statements in the script.  This simply must not happen.  */
+   ldin = fopen (linker_script, "r");
+-  if (ldin == NULL)
+-    error (EXIT_FAILURE, errno, gettext ("cannot open linker script '%s'"),
++  if (ldin == NULL) {
++    err (errno, gettext ("cannot open linker script '%s'"),
+ 	   linker_script);
++    error_message_count++;
++  }
+   /* No need for locking.  */
+   __fsetlocking (ldin, FSETLOCKING_BYCALLER);
+ 
+@@ -380,7 +386,8 @@
+   /* See whether all opened -( were closed.  */
+   if (group_level > 0)
+     {
+-      error (0, 0, gettext ("-( without matching -)"));
++      err (0, gettext ("-( without matching -)"));
++      error_message_count++;
+       argp_help (&argp_1st, stderr, ARGP_HELP_SEE, "ld");
+       exit (EXIT_FAILURE);
+     }

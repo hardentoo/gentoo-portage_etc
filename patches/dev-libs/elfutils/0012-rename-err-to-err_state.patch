@@ -1,0 +1,37 @@
+diff -Nuar elfutils-0.166.orig/src/ld.c elfutils-0.166/src/ld.c
+--- elfutils-0.166.orig/src/ld.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/ld.c	2016-07-09 15:14:45.681174870 +0100
+@@ -274,7 +274,7 @@
+ main (int argc, char *argv[])
+ {
+   int remaining;
+-  int err;
++  int err_state;
+   int error_message_count = 0;
+ 
+   /* Sanity check.  We always want to use the LFS functionality.  */
+@@ -332,8 +332,8 @@
+     ld_state.hash_style = hash_style_sysv;
+ 
+   /* Prepare state.  */
+-  err = ld_prepare_state (emulation);
+-  if (err != 0) {
++  err_state = ld_prepare_state (emulation);
++  if (err_state != 0) {
+     err (EXIT_FAILURE, gettext ("error while preparing linking"));
+     error_message_count++;
+   }
+@@ -482,11 +482,11 @@
+     exit (1);
+ 
+   /* Finalize the output file, write the data out.  */
+-  err |= FINALIZE (&ld_state);
++  err_state |= FINALIZE (&ld_state);
+ 
+   /* Return with an non-zero exit status also if any error message has
+      been printed.  */
+-  return err | (error_message_count != 0);
++  return err_state | (error_message_count != 0);
+ }
+ 
+ 

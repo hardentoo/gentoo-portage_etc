@@ -1,0 +1,19 @@
+diff -Nuar elfutils-0.166.orig/src/readelf.c elfutils-0.166/src/readelf.c
+--- elfutils-0.166.orig/src/readelf.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/readelf.c	2016-07-09 14:10:13.712707303 +0100
+@@ -282,6 +282,7 @@
+ 
+   /* Parse and process arguments.  */
+   int remaining;
++  int error_message_count = 0;
+   argp_parse (&argp, argc, argv, 0, &remaining, NULL);
+ 
+   /* Before we start tell the ELF library which version we are using.  */
+@@ -296,6 +297,7 @@
+       if (fd == -1)
+ 	{
+ 	  error (0, errno, gettext ("cannot open input file"));
++	  error_message_count++;
+ 	  continue;
+ 	}
+ 

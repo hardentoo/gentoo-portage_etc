@@ -1,0 +1,70 @@
+diff -Nuar elfutils-0.166.orig/src/ldgeneric.c elfutils-0.166/src/ldgeneric.c
+--- elfutils-0.166.orig/src/ldgeneric.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/ldgeneric.c	2016-07-09 15:18:14.066713818 +0100
+@@ -455,7 +455,7 @@
+ open_along_path (struct usedfiles *fileinfo)
+ {
+   const char *fname = fileinfo->fname;
+-  int err = ENOENT;
++  int err_state = ENOENT;
+ 
+   if (fileinfo->file_type == relocatable_file_type)
+     {
+@@ -472,43 +472,43 @@
+ 	}
+ 
+       /* If the name is an absolute path we are done.  */
+-      err = errno;
++      err_state = errno;
+     }
+   else
+     {
+       /* If the user specified two parts to the LD_LIBRARY_PATH variable
+ 	 try the first part now.  */
+-      err = open_along_path2 (fileinfo, ld_state.ld_library_path1);
++      err_state = open_along_path2 (fileinfo, ld_state.ld_library_path1);
+ 
+       /* Try the user-specified path next.  */
+-      if (err == ENOENT)
+-	err = open_along_path2 (fileinfo,
++      if (err_state == ENOENT)
++	err_state = open_along_path2 (fileinfo,
+ 				fileinfo->file_type == archive_file_type
+ 				? ld_state.paths : ld_state.rpath_link);
+ 
+       /* Then the second part of the LD_LIBRARY_PATH value.  */
+-      if (unlikely (err == ENOENT))
++      if (unlikely (err_state == ENOENT))
+ 	{
+-	  err = open_along_path2 (fileinfo, ld_state.ld_library_path2);
++	  err_state = open_along_path2 (fileinfo, ld_state.ld_library_path2);
+ 
+ 	  /* In case we look for a DSO handle now the RUNPATH.  */
+-	  if (err == ENOENT)
++	  if (err_state == ENOENT)
+ 	    {
+ 	      if (fileinfo->file_type == dso_file_type)
+-		err = open_along_path2 (fileinfo, ld_state.runpath_link);
++		err_state = open_along_path2 (fileinfo, ld_state.runpath_link);
+ 
+ 	      /* Finally the path from the default linker script.  */
+-	      if (err == ENOENT)
+-		err = open_along_path2 (fileinfo, ld_state.default_paths);
++	      if (err_state == ENOENT)
++		err_state = open_along_path2 (fileinfo, ld_state.default_paths);
+ 	    }
+ 	}
+     }
+ 
+-  if (unlikely (err != 0)
+-      && (err != EAGAIN || fileinfo->file_type == relocatable_file_type))
+-    error (0, err, gettext ("cannot open %s"), fileinfo->fname);
++  if (unlikely (err_state != 0)
++      && (err_state != EAGAIN || fileinfo->file_type == relocatable_file_type))
++    err (0, err_state, gettext ("cannot open %s"), fileinfo->fname);
+ 
+-  return err;
++  return err_state;
+ }
+ 
+ 

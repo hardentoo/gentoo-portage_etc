@@ -1,0 +1,11 @@
+diff -Nuar elfutils-0.166.orig/libdwfl/linux-kernel-modules.c elfutils-0.166/libdwfl/linux-kernel-modules.c
+--- elfutils-0.166.orig/libdwfl/linux-kernel-modules.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/libdwfl/linux-kernel-modules.c	2016-07-08 20:48:35.677475705 +0100
+@@ -29,6 +29,7 @@
+ /* We include this before config.h because it can't handle _FILE_OFFSET_BITS.
+    Everything we need here is fine if its declarations just come first.  */
+ 
++#include <sys/types.h>
+ #include <fts.h>
+ 
+ #include <config.h>

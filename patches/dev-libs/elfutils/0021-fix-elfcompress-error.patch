@@ -1,0 +1,548 @@
+diff -Nuar elfutils-0.166.orig/src/elfcompress.c elfutils-0.166/src/elfcompress.c
+--- elfutils-0.166.orig/src/elfcompress.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/elfcompress.c	2016-07-09 16:00:19.488385026 +0100
+@@ -18,7 +18,7 @@
+ #include <config.h>
+ #include <assert.h>
+ #include <argp.h>
+-#include <error.h>
++#include <err.h>
+ #include <stdbool.h>
+ #include <stdlib.h>
+ #include <inttypes.h>
+@@ -218,7 +218,7 @@
+     res = elf_compress (scn, compress ? ELFCOMPRESS_ZLIB : 0, flags);
+ 
+   if (res < 0)
+-    error (0, 0, "Couldn't decompress section [%zd] %s: %s",
++    err (0, "Couldn't decompress section [%zd] %s: %s",
+ 	   ndx, name, elf_errmsg (-1));
+   else
+     {
+@@ -241,7 +241,7 @@
+ 	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+ 	  if (shdr == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get shdr for section [%zd]", ndx);
++	      err (0, "Couldn't get shdr for section [%zd]", ndx);
+ 	      return -1;
+ 	    }
+ 	  float new = shdr->sh_size;
+@@ -336,14 +336,14 @@
+   fd = open (fname, O_RDONLY);
+   if (fd < 0)
+     {
+-      error (0, errno, "Couldn't open %s\n", fname);
++      err (errno, "Couldn't open %s\n", fname);
+       return cleanup (-1);
+     }
+ 
+   elf = elf_begin (fd, ELF_C_READ, NULL);
+   if (elf == NULL)
+     {
+-      error (0, 0, "Couldn't open ELF file %s for reading: %s",
++      err (0, "Couldn't open ELF file %s for reading: %s",
+ 	     fname, elf_errmsg (-1));
+       return cleanup (-1);
+     }
+@@ -353,23 +353,23 @@
+   if (kind != ELF_K_ELF)
+     {
+       if (kind == ELF_K_AR)
+-	error (0, 0, "Cannot handle ar files: %s", fname);
++	err (0, "Cannot handle ar files: %s", fname);
+       else
+-	error (0, 0, "Unknown file type: %s", fname);
++	err (0, "Unknown file type: %s", fname);
+       return cleanup (-1);
+     }
+ 
+   struct stat st;
+   if (fstat (fd, &st) != 0)
+     {
+-      error (0, errno, "Couldn't fstat %s", fname);
++      err (errno, "Couldn't fstat %s", fname);
+       return cleanup (-1);
+     }
+ 
+   GElf_Ehdr ehdr;
+   if (gelf_getehdr (elf, &ehdr) == NULL)
+     {
+-      error (0, 0, "Couldn't get ehdr for %s: %s", fname, elf_errmsg (-1));
++      err (0, "Couldn't get ehdr for %s: %s", fname, elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -377,7 +377,7 @@
+   size_t shdrstrndx;
+   if (elf_getshdrstrndx (elf, &shdrstrndx) != 0)
+     {
+-      error (0, 0, "Couldn't get section header string table index in %s: %s",
++      err (0, "Couldn't get section header string table index in %s: %s",
+ 	     fname, elf_errmsg (-1));
+       return cleanup (-1);
+     }
+@@ -385,14 +385,14 @@
+   /* How many sections are we talking about?  */
+   if (elf_getshdrnum (elf, &shnum) != 0)
+     {
+-      error (0, 0, "Couldn't get number of sections in %s: %s",
++      err (0, "Couldn't get number of sections in %s: %s",
+ 	     fname, elf_errmsg (1));
+       return cleanup (-1);
+     }
+ 
+   if (shnum == 0)
+     {
+-      error (0, 0, "ELF file %s has no sections", fname);
++      err (0, "ELF file %s has no sections", fname);
+       return cleanup (-1);
+     }
+ 
+@@ -401,7 +401,7 @@
+   size_t phnum;
+   if (elf_getphdrnum (elf, &phnum) != 0)
+     {
+-      error (0, 0, "Couldn't get phdrnum: %s", elf_errmsg (-1));
++      err (0, "Couldn't get phdrnum: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -454,7 +454,7 @@
+       size_t ndx = elf_ndxscn (scn);
+       if (ndx > shnum)
+ 	{
+-	  error (0, 0, "Unexpected section number %zd, expected only %zd",
++	  err (0, "Unexpected section number %zd, expected only %zd",
+ 		 ndx, shnum);
+ 	  cleanup (-1);
+ 	}
+@@ -463,14 +463,14 @@
+       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+       if (shdr == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get shdr for section %zd", ndx);
++	  err (0, "Couldn't get shdr for section %zd", ndx);
+ 	  return cleanup (-1);
+ 	}
+ 
+       const char *sname = elf_strptr (elf, shdrstrndx, shdr->sh_name);
+       if (sname == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get name for section %zd", ndx);
++	  err (0, "Couldn't get name for section %zd", ndx);
+ 	  return cleanup (-1);
+ 	}
+ 
+@@ -511,7 +511,7 @@
+ 	    {
+ 	      if (symtabndx != 0)
+ 		{
+-		  error (0, 0,
++		  err (0,
+ 			 "Multiple symbol tables (%zd, %zd) using the same string table unsupported", symtabndx, ndx);
+ 		  return cleanup (-1);
+ 		}
+@@ -535,7 +535,7 @@
+       names = ebl_strtabinit (true);
+       if (names == NULL)
+ 	{
+-	  error (0, 0, "Not enough memory for new strtab");
++	  err (0, "Not enough memory for new strtab");
+ 	  return cleanup (-1);
+ 	}
+       scnstrents = xmalloc (shnum
+@@ -559,7 +559,7 @@
+ 
+   if (fdnew < 0)
+     {
+-      error (0, errno, "Couldn't create output file %s", fnew);
++      err (errno, "Couldn't create output file %s", fnew);
+       /* Since we didn't create it we don't want to try to unlink it.  */
+       free (fnew);
+       fnew = NULL;
+@@ -569,7 +569,7 @@
+   elfnew = elf_begin (fdnew, ELF_C_WRITE, NULL);
+   if (elfnew == NULL)
+     {
+-      error (0, 0, "Couldn't open new ELF %s for writing: %s",
++      err (0, "Couldn't open new ELF %s for writing: %s",
+ 	     fnew, elf_errmsg (-1));
+       return cleanup (-1);
+     }
+@@ -577,14 +577,14 @@
+   /* Create the new ELF header and copy over all the data.  */
+   if (gelf_newehdr (elfnew, gelf_getclass (elf)) == 0)
+     {
+-      error (0, 0, "Couldn't create new ehdr: %s", elf_errmsg (-1));
++      err (0, "Couldn't create new ehdr: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+   GElf_Ehdr newehdr;
+   if (gelf_getehdr (elfnew, &newehdr) == NULL)
+     {
+-      error (0, 0, "Couldn't get new ehdr: %s", elf_errmsg (-1));
++      err (0, "Couldn't get new ehdr: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -597,7 +597,7 @@
+ 
+   if (gelf_update_ehdr (elfnew, &newehdr) == 0)
+     {
+-      error (0, 0, "Couldn't update ehdr: %s", elf_errmsg (-1));
++      err (0, "Couldn't update ehdr: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -606,7 +606,7 @@
+     {
+       if (gelf_newphdr (elfnew, phnum) == 0)
+ 	{
+-	  error (0, 0, "Couldn't create phdrs: %s", elf_errmsg (-1));
++	  err (0, "Couldn't create phdrs: %s", elf_errmsg (-1));
+ 	  return cleanup (-1);
+ 	}
+ 
+@@ -616,12 +616,12 @@
+ 	  GElf_Phdr *phdr = gelf_getphdr (elf, cnt, &phdr_mem);
+ 	  if (phdr == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get phdr %zd: %s", cnt, elf_errmsg (-1));
++	      err (0, "Couldn't get phdr %zd: %s", cnt, elf_errmsg (-1));
+ 	      return cleanup (-1);
+ 	    }
+ 	  if (gelf_update_phdr (elfnew, cnt, phdr) == 0)
+ 	    {
+-	      error (0, 0, "Couldn't create phdr %zd: %s", cnt,
++	      err (0, "Couldn't create phdr %zd: %s", cnt,
+ 		     elf_errmsg (-1));
+ 	      return cleanup (-1);
+ 	    }
+@@ -666,7 +666,7 @@
+ 	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+ 	  if (shdr == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get shdr for section %zd", ndx);
++	      err (0, "Couldn't get shdr for section %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -674,7 +674,7 @@
+ 	  sname = elf_strptr (elf, shdrstrndx, shdr->sh_name);
+ 	  if (sname == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get name for section %zd", ndx);
++	      err (0, "Couldn't get name for section %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -819,7 +819,7 @@
+       Elf_Scn *newscn = elf_newscn (elfnew);
+       if (newscn == NULL)
+ 	{
+-	  error (0, 0, "Couldn't create new section %zd", ndx);
++	  err (0, "Couldn't create new section %zd", ndx);
+ 	  return cleanup (-1);
+ 	}
+ 
+@@ -827,13 +827,13 @@
+       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+       if (shdr == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get shdr for section %zd", ndx);
++	  err (0, "Couldn't get shdr for section %zd", ndx);
+ 	  return cleanup (-1);
+ 	}
+ 
+       if (gelf_update_shdr (newscn, shdr) == 0)
+         {
+-	  error (0, 0, "Couldn't update section header %zd", ndx);
++	  err (0, "Couldn't update section header %zd", ndx);
+ 	  return cleanup (-1);
+ 	}
+ 
+@@ -846,14 +846,14 @@
+ 	  Elf_Data *data = elf_getdata (scn, NULL);
+ 	  if (data == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get data from section %zd", ndx);
++	      err (0, "Couldn't get data from section %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+ 	  Elf_Data *newdata = elf_newdata (newscn);
+ 	  if (newdata == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't create new data for section %zd", ndx);
++	      err (0, "Couldn't create new data for section %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -871,7 +871,7 @@
+ 	      name = elf_strptr (elf, shdrstrndx, shdr->sh_name);
+ 	      if (name == NULL)
+ 		{
+-		  error (0, 0, "Couldn't get name for section [%zd]", ndx);
++		  err (0, "Couldn't get name for section [%zd]", ndx);
+ 		  return cleanup (-1);
+ 		}
+ 	    }
+@@ -880,7 +880,7 @@
+ 	  name = scnnames[ndx] = xstrdup (name);
+ 	  if ((scnstrents[ndx] = ebl_strtabadd (names, name, 0)) == NULL)
+ 	    {
+-	      error (0, 0, "No memory to add section name string table");
++	      err (0, "No memory to add section name string table");
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -918,7 +918,7 @@
+ 	      Elf_Data *symd = elf_getdata (newscn, NULL);
+ 	      if (symd == NULL)
+ 		{
+-		  error (0, 0, "Couldn't get symtab data for section [%zd] %s",
++		  err (0, "Couldn't get symtab data for section [%zd] %s",
+ 			 ndx, name);
+ 		  return cleanup (-1);
+ 		}
+@@ -931,7 +931,7 @@
+ 		  GElf_Sym *sym = gelf_getsym (symd, i, &sym_mem);
+ 		  if (sym == NULL)
+ 		    {
+-		      error (0, 0, "Couldn't get symbol %zd", i);
++		      err (0, "Couldn't get symbol %zd", i);
+ 		      return cleanup (-1);
+ 		    }
+ 		  if (sym->st_name != 0)
+@@ -943,13 +943,13 @@
+ 							sym->st_name);
+ 		      if (symname == NULL)
+ 			{
+-			  error (0, 0, "Couldn't get symbol %zd name", i);
++			  err (0, "Couldn't get symbol %zd name", i);
+ 			  return cleanup (-1);
+ 			}
+ 		      symstrents[i] = ebl_strtabadd (names, symname, 0);
+ 		      if (symstrents[i] == NULL)
+ 			{
+-			  error (0, 0, "No memory to add to symbol name");
++			  err (0, "No memory to add to symbol name");
+ 			  return cleanup (-1);
+ 			}
+ 		    }
+@@ -967,7 +967,7 @@
+       scn = elf_getscn (elfnew, shdrstrndx);
+       if (scn == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get new section header string table [%zd]",
++	  err (0, "Couldn't get new section header string table [%zd]",
+ 		 shdrstrndx);
+ 	  return cleanup (-1);
+ 	}
+@@ -975,7 +975,7 @@
+       Elf_Data *data = elf_newdata (scn);
+       if (data == NULL)
+ 	{
+-	  error (0, 0, "Couldn't create new section header string table data");
++	  err (0, "Couldn't create new section header string table data");
+ 	  return cleanup (-1);
+ 	}
+       ebl_strtabfinalize (names, data);
+@@ -985,7 +985,7 @@
+       GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+       if (shdr == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get shdr for new section strings %zd",
++	  err (0, "Couldn't get shdr for new section strings %zd",
+ 		 shdrstrndx);
+ 	  return cleanup (-1);
+ 	}
+@@ -1005,7 +1005,7 @@
+ 
+       if (gelf_update_shdr (scn, shdr) == 0)
+ 	{
+-	  error (0, 0, "Couldn't update new section strings [%zd]",
++	  err (0, "Couldn't update new section strings [%zd]",
+ 		 shdrstrndx);
+ 	  return cleanup (-1);
+ 	}
+@@ -1021,7 +1021,7 @@
+ 	  Elf_Scn *oldscn = elf_getscn (elf, shdrstrndx);
+ 	  if (oldscn == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get section header string table [%zd]",
++	      err (0, "Couldn't get section header string table [%zd]",
+ 		     shdrstrndx);
+ 	      return cleanup (-1);
+ 	    }
+@@ -1029,7 +1029,7 @@
+ 	  shdr = gelf_getshdr (oldscn, &shdr_mem);
+ 	  if (shdr == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get shdr for old section strings [%zd]",
++	      err (0, "Couldn't get shdr for old section strings [%zd]",
+ 		     shdrstrndx);
+ 	      return cleanup (-1);
+ 	    }
+@@ -1037,7 +1037,7 @@
+ 	  shstrtab_name = elf_strptr (elf, shdrstrndx, shdr->sh_name);
+ 	  if (shstrtab_name == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get name for old section strings [%zd]",
++	      err (0, "Couldn't get name for old section strings [%zd]",
+ 		     shdrstrndx);
+ 	      return cleanup (-1);
+ 	    }
+@@ -1064,7 +1064,7 @@
+      have changed it.  */
+   if (gelf_getehdr (elfnew, &newehdr) == NULL)
+     {
+-      error (0, 0, "Couldn't re-get new ehdr: %s", elf_errmsg (-1));
++      err (0, "Couldn't re-get new ehdr: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -1072,7 +1072,7 @@
+      zero might not exist yet.  */
+   if (setshdrstrndx (elfnew, &newehdr, shdrstrndx) != 0)
+     {
+-      error (0, 0, "Couldn't set new shdrstrndx: %s", elf_errmsg (-1));
++      err (0, "Couldn't set new shdrstrndx: %s", elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -1089,7 +1089,7 @@
+ 	  GElf_Shdr *shdr = gelf_getshdr (scn, &shdr_mem);
+ 	  if (shdr == NULL)
+ 	    {
+-	      error (0, 0, "Couldn't get shdr for section %zd", ndx);
++	      err (0, "Couldn't get shdr for section %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -1111,7 +1111,7 @@
+ 
+ 	  if (gelf_update_shdr (scn, shdr) == 0)
+ 	    {
+-	      error (0, 0, "Couldn't update section header %zd", ndx);
++	      err (0, "Couldn't update section header %zd", ndx);
+ 	      return cleanup (-1);
+ 	    }
+ 
+@@ -1123,7 +1123,7 @@
+ 	      Elf_Data *symd = elf_getdata (scn, NULL);
+ 	      if (symd == NULL)
+ 		{
+-		  error (0, 0, "Couldn't get new symtab data section [%zd]",
++		  err (0, "Couldn't get new symtab data section [%zd]",
+ 			 ndx);
+ 		  return cleanup (-1);
+ 		}
+@@ -1135,7 +1135,7 @@
+ 		  GElf_Sym *sym = gelf_getsym (symd, i, &sym_mem);
+ 		  if (sym == NULL)
+ 		    {
+-		      error (0, 0, "2 Couldn't get symbol %zd", i);
++		      err (0, "2 Couldn't get symbol %zd", i);
+ 		      return cleanup (-1);
+ 		    }
+ 
+@@ -1145,7 +1145,7 @@
+ 
+ 		      if (gelf_update_sym (symd, i, sym) == 0)
+ 			{
+-			  error (0, 0, "Couldn't update symbol %zd", i);
++			  err (0, "Couldn't update symbol %zd", i);
+ 			  return cleanup (-1);
+ 			}
+ 		    }
+@@ -1162,7 +1162,7 @@
+ 		  Elf_Scn *oldscn = elf_getscn (elf, symtabndx);
+ 		  if (oldscn == NULL)
+ 		    {
+-		      error (0, 0, "Couldn't get symbol table [%zd]",
++		      err (0, "Couldn't get symbol table [%zd]",
+ 			     symtabndx);
+ 		      return cleanup (-1);
+ 		    }
+@@ -1170,7 +1170,7 @@
+ 		  shdr = gelf_getshdr (oldscn, &shdr_mem);
+ 		  if (shdr == NULL)
+ 		    {
+-		      error (0, 0, "Couldn't get old symbol table shdr [%zd]",
++		      err (0, "Couldn't get old symbol table shdr [%zd]",
+ 			     symtabndx);
+ 		      return cleanup (-1);
+ 		    }
+@@ -1178,7 +1178,7 @@
+ 		  symtab_name = elf_strptr (elf, shdrstrndx, shdr->sh_name);
+ 		  if (symtab_name == NULL)
+ 		    {
+-		      error (0, 0, "Couldn't get old symbol table name [%zd]",
++		      err (0, "Couldn't get old symbol table name [%zd]",
+ 			     symtabndx);
+ 		      return cleanup (-1);
+ 		    }
+@@ -1211,7 +1211,7 @@
+     {
+       if (gelf_getehdr (elfnew, &newehdr) == NULL)
+ 	{
+-	  error (0, 0, "Couldn't get ehdr: %s", elf_errmsg (-1));
++	  err (0, "Couldn't get ehdr: %s", elf_errmsg (-1));
+ 	  return cleanup (-1);
+ 	}
+ 
+@@ -1226,7 +1226,7 @@
+ 
+       if (gelf_update_ehdr (elfnew, &newehdr) == 0)
+ 	{
+-	  error (0, 0, "Couldn't update ehdr: %s", elf_errmsg (-1));
++	  err (0, "Couldn't update ehdr: %s", elf_errmsg (-1));
+ 	  return cleanup (-1);
+ 	}
+     }
+@@ -1236,7 +1236,7 @@
+ 
+   if (elf_update (elfnew, ELF_C_WRITE) < 0)
+     {
+-      error (0, 0, "Couldn't write %s: %s", fnew, elf_errmsg (-1));
++      err (0, "Couldn't write %s: %s", fnew, elf_errmsg (-1));
+       return cleanup (-1);
+     }
+ 
+@@ -1246,16 +1246,16 @@
+   /* Try to match mode and owner.group of the original file.  */
+   if (fchmod (fdnew, st.st_mode & ALLPERMS) != 0)
+     if (verbose >= 0)
+-      error (0, errno, "Couldn't fchmod %s", fnew);
++      err (errno, "Couldn't fchmod %s", fnew);
+   if (fchown (fdnew, st.st_uid, st.st_gid) != 0)
+     if (verbose >= 0)
+-      error (0, errno, "Couldn't fchown %s", fnew);
++      err (errno, "Couldn't fchown %s", fnew);
+ 
+   /* Finally replace the old file with the new file.  */
+   if (foutput == NULL)
+     if (rename (fnew, fname) != 0)
+       {
+-	error (0, errno, "Couldn't rename %s to %s", fnew, fname);
++	err (errno, "Couldn't rename %s to %s", fnew, fname);
+ 	return cleanup (-1);
+       }
+ 
+@@ -1310,11 +1310,11 @@
+   /* Should already be handled by ARGP_KEY_NO_ARGS case above,
+      just sanity check.  */
+   if (remaining >= argc)
+-    error (EXIT_FAILURE, 0, N_("No input file given"));
++    err (EXIT_FAILURE, N_("No input file given"));
+ 
+   /* Likewise for the ARGP_KEY_ARGS case above, an extra sanity check.  */
+   if (foutput != NULL && remaining + 1 < argc)
+-    error (EXIT_FAILURE, 0,
++    err (EXIT_FAILURE,
+ 	   N_("Only one input file allowed together with '-o'"));
+ 
+   elf_version (EV_CURRENT);

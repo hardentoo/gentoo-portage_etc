@@ -1,0 +1,24 @@
+diff -Nuar elfutils-0.166.orig/src/Makefile.am elfutils-0.166/src/Makefile.am
+--- elfutils-0.166.orig/src/Makefile.am	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/Makefile.am	2016-07-09 15:43:59.911151775 +0100
+@@ -120,7 +120,7 @@
+ addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD) $(demanglelib)
+ elfcmp_LDADD = $(libebl) $(libelf) $(argp_LDADD) -ldl
+ objdump_LDADD  = $(libasm) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+-ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
++ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) -lobstack
+ strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+ ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
+ unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl
+diff -Nuar elfutils-0.166.orig/src/Makefile.in elfutils-0.166/src/Makefile.in
+--- elfutils-0.166.orig/src/Makefile.in	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/Makefile.in	2016-07-09 15:44:12.560245499 +0100
+@@ -565,7 +565,7 @@
+ addr2line_LDADD = $(libdw) $(libelf) $(argp_LDADD) $(demanglelib)
+ elfcmp_LDADD = $(libebl) $(libelf) $(argp_LDADD) -ldl
+ objdump_LDADD = $(libasm) $(libebl) $(libelf) $(libeu) $(argp_LDADD) -ldl
+-ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
++ranlib_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD) -lobstack
+ strings_LDADD = $(libelf) $(libeu) $(argp_LDADD)
+ ar_LDADD = libar.a $(libelf) $(libeu) $(argp_LDADD)
+ unstrip_LDADD = $(libebl) $(libelf) $(libdw) $(libeu) $(argp_LDADD) -ldl

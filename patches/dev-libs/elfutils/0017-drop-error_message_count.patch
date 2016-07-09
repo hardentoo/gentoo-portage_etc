@@ -1,0 +1,12 @@
+diff -Nuar elfutils-0.166.orig/src/ldgeneric.c elfutils-0.166/src/ldgeneric.c
+--- elfutils-0.166.orig/src/ldgeneric.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/ldgeneric.c	2016-07-09 15:41:39.799113611 +0100
+@@ -2633,7 +2633,7 @@
+ static void
+ remove_tempfile (void)
+ {
+-  if (error_message_count != 0 && ld_state.tempfname != NULL)
++  if (ld_state.tempfname != NULL)
+     unlink (ld_state.tempfname);
+ }
+ 

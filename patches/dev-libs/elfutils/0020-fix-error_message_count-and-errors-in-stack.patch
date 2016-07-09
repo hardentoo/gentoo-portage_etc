@@ -1,0 +1,136 @@
+diff -Nuar elfutils-0.166.orig/src/stack.c elfutils-0.166/src/stack.c
+--- elfutils-0.166.orig/src/stack.c	2016-03-31 09:59:09.000000000 +0100
++++ elfutils-0.166/src/stack.c	2016-07-09 15:54:16.572706734 +0100
+@@ -577,36 +577,36 @@
+ 	{
+ 	  dwfl = dwfl_begin (&proc_callbacks);
+ 	  if (dwfl == NULL)
+-	    error (EXIT_BAD, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
++	    err (EXIT_BAD, "dwfl_begin: %s", dwfl_errmsg (-1));
+ 
+-	  int err = dwfl_linux_proc_report (dwfl, pid);
+-	  if (err < 0)
+-	    error (EXIT_BAD, 0, "dwfl_linux_proc_report pid %d: %s", pid,
++	  int err_state = dwfl_linux_proc_report (dwfl, pid);
++	  if (err_state < 0)
++	    err (EXIT_BAD, "dwfl_linux_proc_report pid %d: %s", pid,
+ 		   dwfl_errmsg (-1));
+-	  else if (err > 0)
+-	    error (EXIT_BAD, err, "dwfl_linux_proc_report pid %d", pid);
++	  else if (err_state > 0)
++	    err (err_state, "dwfl_linux_proc_report pid %d", pid);
+ 	}
+ 
+       if (core != NULL)
+ 	{
+ 	  dwfl = dwfl_begin (&core_callbacks);
+ 	  if (dwfl == NULL)
+-	    error (EXIT_BAD, 0, "dwfl_begin: %s", dwfl_errmsg (-1));
++	    err (EXIT_BAD, "dwfl_begin: %s", dwfl_errmsg (-1));
+ 	  if (dwfl_core_file_report (dwfl, core, exec) < 0)
+-	    error (EXIT_BAD, 0, "dwfl_core_file_report: %s", dwfl_errmsg (-1));
++	    err (EXIT_BAD, "dwfl_core_file_report: %s", dwfl_errmsg (-1));
+ 	}
+ 
+       if (dwfl_report_end (dwfl, NULL, NULL) != 0)
+-	error (EXIT_BAD, 0, "dwfl_report_end: %s", dwfl_errmsg (-1));
++	err (EXIT_BAD, "dwfl_report_end: %s", dwfl_errmsg (-1));
+ 
+       if (pid != 0)
+ 	{
+-	  int err = dwfl_linux_proc_attach (dwfl, pid, false);
+-	  if (err < 0)
+-	    error (EXIT_BAD, 0, "dwfl_linux_proc_attach pid %d: %s", pid,
++	  int err_state = dwfl_linux_proc_attach (dwfl, pid, false);
++	  if (err_state < 0)
++	    err (EXIT_BAD, "dwfl_linux_proc_attach pid %d: %s", pid,
+ 		   dwfl_errmsg (-1));
+-	  else if (err > 0)
+-	    error (EXIT_BAD, err, "dwfl_linux_proc_attach pid %d", pid);
++	  else if (err_state > 0)
++	    err (err_state, "dwfl_linux_proc_attach pid %d", pid);
+ 	}
+ 
+       if (core != NULL)
+@@ -617,7 +617,7 @@
+ 
+       /* Makes sure we are properly attached.  */
+       if (dwfl_pid (dwfl) < 0)
+-	error (EXIT_BAD, 0, "dwfl_pid: %s\n", dwfl_errmsg (-1));
++	err (EXIT_BAD, "dwfl_pid: %s\n", dwfl_errmsg (-1));
+       break;
+ 
+     default:
+@@ -692,12 +692,15 @@
+ 
+   argp_parse (&argp, argc, argv, 0, NULL, NULL);
+ 
++  int error_message_count = 0;
+   if (show_modules)
+     {
+       printf ("PID %d - %s module memory map\n", dwfl_pid (dwfl),
+ 	      pid != 0 ? "process" : "core");
+-      if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0)
+-	error (EXIT_BAD, 0, "dwfl_getmodules: %s", dwfl_errmsg (-1));
++      if (dwfl_getmodules (dwfl, module_callback, NULL, 0) != 0) {
++	err (EXIT_BAD, "dwfl_getmodules: %s", dwfl_errmsg (-1));
++	error_message_count++;
++      }
+     }
+ 
+   struct frames frames;
+@@ -706,24 +709,26 @@
+   frames.allocated = maxframes == 0 ? 2048 : maxframes;
+   frames.frames = 0;
+   frames.frame = malloc (sizeof (struct frame) * frames.allocated);
+-  if (frames.frame == NULL)
+-    error (EXIT_BAD, errno, "malloc frames.frame");
++  if (frames.frame == NULL) {
++    err (errno, "malloc frames.frame");
++    error_message_count++;
++  }
+ 
+   if (show_one_tid)
+     {
+-      int err = 0;
++      int err_state = 0;
+       switch (dwfl_getthread_frames (dwfl, pid, frame_callback, &frames))
+ 	{
+ 	case DWARF_CB_OK:
+ 	case DWARF_CB_ABORT:
+ 	  break;
+ 	case -1:
+-	  err = dwfl_errno ();
++	  err_state = dwfl_errno ();
+ 	  break;
+ 	default:
+ 	  abort ();
+ 	}
+-      print_frames (&frames, pid, err, "dwfl_getthread_frames");
++      print_frames (&frames, pid, err_state, "dwfl_getthread_frames");
+     }
+   else
+     {
+@@ -734,7 +739,8 @@
+ 	case DWARF_CB_ABORT:
+ 	  break;
+ 	case -1:
+-	  error (0, 0, "dwfl_getthreads: %s", dwfl_errmsg (-1));
++	  err (0, "dwfl_getthreads: %s", dwfl_errmsg (-1));
++	  error_message_count++;
+ 	  break;
+ 	default:
+ 	  abort ();
+@@ -753,8 +759,10 @@
+   free (demangle_buffer);
+ #endif
+ 
+-  if (! frames_shown)
+-    error (EXIT_BAD, 0, N_("Couldn't show any frames."));
++  if (! frames_shown) {
++    err (EXIT_BAD, N_("Couldn't show any frames."));
++    error_message_count++;
++  }
+ 
+   return error_message_count != 0 ? EXIT_ERROR : EXIT_OK;
+ }
