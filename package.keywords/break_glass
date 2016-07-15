@@ -1,3 +1,4 @@
+<app-arch/sharutils-4.15.3
 <app-emulation/lxc-1.2
 <app-eselect/eselect-python-20151231
 <app-misc/scrub-2.7
@@ -77,6 +78,7 @@
 <media-libs/avidemux-core-2.7
 <media-libs/avidemux-plugins-2.7
 <media-libs/libpng-1.7
+<media-libs/libv4l-1.11
 <media-libs/phonon-4.10
 <media-libs/phonon-gstreamer-4.10
 <media-video/avidemux-2.7
@@ -106,4 +108,3 @@
 <x11-misc/obconf-qt-1.0
 <x11-misc/pcmanfm-qt-0.11
 <x11-terms/qterminal-0.7
-<media-libs/libv4l-1.11
