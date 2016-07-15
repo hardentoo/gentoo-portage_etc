@@ -1,0 +1,22 @@
+diff --git a/src/kcatalog.cpp b/src/kcatalog.cpp
+index 6682d62341dee03f5fc4906c2a88c6cda82fbedb..f52157da4e44c799913126a684acd82855bbdeb3 100644
+--- a/src/kcatalog.cpp
++++ b/src/kcatalog.cpp
+@@ -41,7 +41,7 @@
+ #endif
+ #endif
+ 
+-#if defined(__USE_GNU_GETTEXT)
++#if defined(__USE_GNU_GETTEXT) && defined(_nl_msg_cat_cntr)
+ extern "C" int Q_DECL_IMPORT _nl_msg_cat_cntr;
+ #endif
+ 
+@@ -173,7 +173,7 @@ void KCatalogPrivate::setupGettextEnv()
+ 
+         // Magic to make sure GNU Gettext doesn't use stale cached translation
+         // from previous language.
+-#if defined(__USE_GNU_GETTEXT)
++#if defined(__USE_GNU_GETTEXT) && defined(_nl_msg_cat_cntr)
+         ++_nl_msg_cat_cntr;
+ #endif
+     }
