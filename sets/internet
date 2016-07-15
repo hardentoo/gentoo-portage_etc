@@ -1,10 +1,11 @@
+#net-irc/konversation
+#www-client/firefox
 media-sound/teamspeak-client-bin
 net-analyzer/nmap
 net-analyzer/tcpdump
 net-dns/bind-tools
 net-ftp/lftp
 net-ftp/ncftp
-#net-irc/konversation
 net-misc/netkit-telnetd
 net-misc/tor
 net-misc/wakeonlan
@@ -13,6 +14,5 @@ net-p2p/freenet
 net-proxy/torsocks
 net-wireless/rfkill
 www-client/chromium
-#www-client/firefox
 www-plugins/adobe-flash
 www-plugins/chrome-binary-plugins:stable
