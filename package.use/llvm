@@ -1,1 +1,2 @@
 sys-devel/llvm gold udis86
+sys-devel/llvm default-compiler-rt default-libcxx
