@@ -1,0 +1,13 @@
+diff -Nuar NetworkManager-1.0.12.orig/libnm-glib/nm-client.c NetworkManager-1.0.12/libnm-glib/nm-client.c
+--- NetworkManager-1.0.12.orig/libnm-glib/nm-client.c	2016-04-01 22:27:51.000000000 +0100
++++ NetworkManager-1.0.12/libnm-glib/nm-client.c	2016-07-21 21:31:36.541696964 +0100
+@@ -336,6 +336,9 @@
+ 	                       G_TYPE_INVALID);
+ 	NM_CLIENT_GET_PRIVATE (self)->perm_call = NULL;
+ 	update_permissions (NM_CLIENT (user_data), error ? NULL : permissions);
++	if (permissions)
++		g_hash_table_destroy (permissions);
++	g_clear_error (&error);
+ }
+ 
+ static void
