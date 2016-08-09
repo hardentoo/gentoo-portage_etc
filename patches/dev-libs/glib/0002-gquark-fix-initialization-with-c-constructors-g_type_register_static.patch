@@ -1,0 +1,23 @@
+diff -Nuar glib-2.48.1.orig/gobject/gtype.c glib-2.48.1/gobject/gtype.c
+--- glib-2.48.1.orig/gobject/gtype.c	2016-02-29 15:32:08.000000000 +0100
++++ glib-2.48.1/gobject/gtype.c	2016-07-28 06:58:59.645630242 +0100
+@@ -2749,6 +2749,9 @@
+   TypeNode *pnode, *node;
+   GType type = 0;
+   
++  if (G_UNLIKELY(static_quark_type_flags == 0))
++    g_quark_init();
++  
+   g_assert_type_system_initialized ();
+   g_return_val_if_fail (parent_type > 0, 0);
+   g_return_val_if_fail (type_name != NULL, 0);
+@@ -2803,6 +2806,9 @@
+ {
+   TypeNode *pnode, *node;
+   GType type;
++
++  if (G_UNLIKELY(static_quark_type_flags == 0))
++    g_quark_init();
+   
+   g_assert_type_system_initialized ();
+   g_return_val_if_fail (parent_type > 0, 0);
