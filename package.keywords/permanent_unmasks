@@ -12,3 +12,4 @@ sys-libs/glibc
 sys-libs/musl
 x11-libs/libfm **
 x11-wm/lumina
+sys-libs/libcxxrt **
