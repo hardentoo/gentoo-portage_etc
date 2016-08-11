@@ -9,7 +9,7 @@ sys-fs/bedup **
 sys-fs/btrfs-progs
 sys-kernel/linux-headers
 sys-libs/glibc
+sys-libs/libcxxrt **
 sys-libs/musl
 x11-libs/libfm **
 x11-wm/lumina
-sys-libs/libcxxrt **
