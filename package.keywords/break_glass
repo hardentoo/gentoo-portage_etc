@@ -4,6 +4,7 @@
 <app-misc/scrub-2.7
 <app-portage/gentoolkit-0.4
 <app-portage/layman-2.4
+<app-text/djvu-3.5.28
 <dev-java/bcprov-1.53
 <dev-java/icedtea-7.3
 <dev-lang/python-2.7.12
