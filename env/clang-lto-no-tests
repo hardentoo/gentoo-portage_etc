@@ -1,0 +1,8 @@
+AR="llvm-ar"
+CC="clang"
+CFLAGS="${CFLAGS} -flto=thin"
+CXX="clang++"
+CXXFLAGS="${CFLAGS}"
+LDFLAGS="${LDFLAGS}"
+NM="llvm-nm"
+RANLIB="llvm-ranlib"

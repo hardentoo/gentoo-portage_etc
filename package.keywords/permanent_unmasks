@@ -4,12 +4,8 @@ media-libs/mesa **
 media-sound/teamspeak-client-bin
 net-p2p/freenet
 sci-misc/boinc
-sys-firmware/nvidia-firmware
-sys-fs/bedup **
+sys-apps/systemd **
 sys-fs/btrfs-progs
 sys-kernel/linux-headers
 sys-libs/glibc
-sys-libs/llvm-libunwind
-sys-libs/musl
-x11-libs/libfm **
-x11-wm/lumina
+x11-apps/piglit **

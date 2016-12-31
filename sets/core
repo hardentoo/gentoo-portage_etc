@@ -1,5 +1,6 @@
 app-admin/sudo
 app-misc/symlinks
+app-portage/mirrorselect
 dev-util/ccache
 net-misc/dhcpcd
 sys-apps/elfix
@@ -9,5 +10,6 @@ sys-apps/irqbalance
 sys-apps/mlocate
 sys-boot/grub
 sys-kernel/dummy-sources
+sys-kernel/genkernel-next
 sys-kernel/linux-firmware
-#x11-misc/bumblebee
+www-client/links
