@@ -84,8 +84,8 @@
 <media-libs/phonon-4.10
 <media-libs/phonon-gstreamer-4.10
 <media-video/avidemux-2.7
-<net-libs/NativeThread-0_pre20081231
 <net-libs/libupnp-1.6.20
+<net-libs/NativeThread-0_pre20081231
 <net-proxy/dante-1.5
 <net-proxy/torsocks-2.2
 <net-wireless/reaver-1.5

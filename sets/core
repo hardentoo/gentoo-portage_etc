@@ -1,4 +1,3 @@
-#x11-misc/bumblebee
 app-admin/sudo
 app-misc/symlinks
 dev-util/ccache
@@ -11,3 +10,4 @@ sys-apps/mlocate
 sys-boot/grub
 sys-kernel/dummy-sources
 sys-kernel/linux-firmware
+#x11-misc/bumblebee
